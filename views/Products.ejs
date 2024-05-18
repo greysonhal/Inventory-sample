@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+
+
+
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 5px; /* Adjust the border radius to your preference */
+}
+
+button:hover {
+  background-color: #0056b3; /* Change the background color on hover */
+}
+        .popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .product-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      flex-grow: 1; /* Make the product name take up remaining space */
+      margin-left: 20px; /* Adjust the margin to your preference */
+    }
+
+    .rename-button,
+    .delete-button {
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+
+    .rename-button{
+      background: #007BFF ;
+    }
+    .delete-button{
+      background:#ff6961 ;
+    }
+
+/* Add a border to separate product items and create rows */
+.product-item + .product-item {
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+      margin-top: 20px;
+    }
+        
+    .popup label {
+      margin-bottom: 5px;
+    }
+
+    .popup select,
+    .popup input {
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 100%; /* Full width */
+      box-sizing: border-box;
+    }
+
+    #close {
+      margin-right: 10px;
+    }
+
+    #submit {
+      margin-left: 10px;
+    }
+    #brandList{
+      background: #fff;
+      margin-top:10px;
+    }
+      
+        
+      </style>
+  </head>
+  <body>
+    <div class="grid-container">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="menu-icon" onclick="openSidebar()">
+          <span class="material-icons-outlined">menu</span>
+        </div>
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <!-- End Header -->
+
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-icons-outlined">inventory</span> GREY INVENTORY
+          </div>
+          <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+        </div>
+
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <a href="/dashboard">
+              <span class="material-icons-outlined">dashboard</span> Dashboard
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/products">
+              <span class="material-icons-outlined">inventory_2</span> Products
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/categories">
+              <span class="material-icons-outlined">fact_check</span> Categories
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/stocks">
+              <span class="material-icons-outlined">add_shopping_cart</span> Stocks
+            </a>
+          </li>
+          
+          <li class="sidebar-list-item">
+            <a href="/home">
+              <span class="material-icons-outlined">logout</span> LogOut
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main -->
+      <main class="main-container">
+        <div class="main-title">
+          <p class="font-weight-bold">PRODUCTS</p>
+        </div>
+
+        <div>
+            <h2>Manage Products</h2>
+            <button onclick="openPopup()">Add New Product</button>
+  
+            <!-- Popup for adding brands -->
+            <div id="brandPopup" class="popup">
+              <h3>Add New Product</h3>
+              <label for="brandName">Enter New Product</label>
+              <input type="text" id="brandName" name="">
+
+              <label for="category">Choose a Category</label>
+              <select id="category">
+                <option value="" disabled selected>Choose a Category</option>
+                <!-- Populate categories dynamically from database -->
+                <% categories.forEach(function(category) { %>
+                  <option value="<%= category.category_name %>"><%= category.category_name %></option>
+                <% }); %>
+              </select>
+
+              <button onclick="closePopup()" id="close">Close</button>
+              <button onclick="addBrand()" id="submit">Submit</button>
+            </div>
+            <div id="overlay" class="overlay"></div>
+            
+            <!-- Display entered brands here -->
+            <div id="brandList">
+              <% products.forEach(function(product) { %>
+                <div class="product-item">
+                  <span class="product-name"><%= product.product_name %></span>
+                  
+                  <button class="rename-button" onclick="openRenamePopup(this.parentElement)">Rename</button>
+                  <button class="delete-button" onclick="deleteProduct(this.parentElement)">Delete</button>
+                </div>
+              <% }); %>
+            </div>
+         
+
+<div id="renamePopup" class="popup">
+    <h3>Rename Product</h3>
+    <label for="newProductName">Enter New Product Name</label>
+    <input type="text" id="newProductName" name="newProductName">
+
+    <button onclick="closeRenamePopup()" id="close">Close</button>
+    <button class="rename-button" onclick="renameProduct()">Rename</button>
+    <input type="hidden" id="productId" name="productId" value="">
+</div>
+
+           
+          </div>
+      
+
+      </main>
+      <!-- End Main -->
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- ApexCharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/scripts.js"></script>
+    <script>
+         function openPopup() {
+    document.getElementById("brandPopup").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+  }
+
+  function closePopup() {
+    document.getElementById("brandPopup").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+  }
+
+  function addBrand() {
+  const brandName = document.getElementById('brandName').value;
+  const category = document.getElementById('category').value;
+
+  if (brandName.trim() !== '' && category.trim() !== '') {
+    // Make an AJAX request to the server to store the product name and category
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/products', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        // Product added successfully
+        console.log('Product added successfully');
+        const product = JSON.parse(xhr.responseText);
+        const productDiv = createProductDiv(product.product_name, product.product_id);
+
+        // Insert the new product div at the beginning of the brandList
+        brandList.insertBefore(productDiv, brandList.firstChild);
+
+        alert(`Product ${brandName} belonging to ${category} has been added successfully`);
+      } else {
+        console.error('Error adding product:', xhr.statusText);
+      }
+    };
+
+    xhr.send(JSON.stringify({ productName: brandName, category: category }));
+
+    // Clear the input values
+    document.getElementById('brandName').value = '';
+    closePopup();
+  }
+}
+
+
+
+function createProductDiv(productName, productId) {
+  const productDiv = document.createElement("div");
+  productDiv.className = "product-item";
+  productDiv.dataset.productId = productId; // Set data-product-id attribute
+  productDiv.innerHTML = `
+    <span class="product-name">${productName}</span>
+    <button class="rename-button" onclick="openRenamePopup(this.parentElement)">Rename</button>
+    <button class="delete-button" onclick="deleteProduct(this.parentElement)">Delete</button>
+  `;
+  return productDiv;
+}
+
+
+
+
+
+
+
+
+function deleteProduct(productDiv) {
+  const productNameElement = productDiv.querySelector('.product-name');
+  const productName = productNameElement.textContent.split(' ')[0]; // Get the product name
+
+  fetch(`/products/${productName}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      body: JSON.stringify({ productName: productName }),
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        console.error('Error deleting product:', data.error);
+        alert(`Error deleting product: ${data.error}`);
+      } else {
+        console.log(`Product ${productName} deleted successfully`);
+        brandList.removeChild(productDiv); // Remove the product div from the brandList
+        const categoryName = data.category_name || 'Unknown Category';
+        alert(`Product ${productName} belonging to ${categoryName} has been deleted successfully`);
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting product:', error);
+      alert(`Error deleting product: ${error.message}`);
+    });
+}
+
+
+function initializeProductList() {
+  // Make an AJAX request to fetch the product names and IDs from the server
+  fetch('/products', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        console.error('Error fetching product names and IDs:', response.statusText);
+        return [];
+      }
+    })
+    .then((products) => {
+      // Render the 'Products.ejs' template and pass the product names and IDs to it
+      const brandList = document.getElementById('brandList');
+      brandList.innerHTML = ''; // Clear the existing content
+
+      // Inside your fetchProductsAndCreateDivs function
+      products.forEach(product => {
+        const productDiv = createProductDiv(product.product_name, product.product_id);
+        brandList.appendChild(productDiv);
+
+        // Ensure that data-product-id is set for existing products
+        productDiv.dataset.productId = product.product_id;
+      });
+    })
+    .catch((error) => {
+      console.error('Error fetching product names and IDs:', error);
+    });
+}
+
+
+
+
+function openRenamePopup(productDiv) {
+  const productId = productDiv.dataset.productId;
+
+  console.log('ProductId:', productId);
+  const productNameElement = productDiv.querySelector('.product-name');
+  const currentProductName = productNameElement.textContent.trim();
+  document.getElementById('newProductName').value = currentProductName;
+
+  // Set the product ID in the hidden input field
+  document.getElementById('productId').value = productId;
+
+  document.getElementById("renamePopup").style.display = "block";
+  document.getElementById("overlay").style.display = "block";
+}
+
+
+
+function closeRenamePopup() {
+  document.getElementById("renamePopup").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
+}
+
+
+function updateProductInList(productId, newProductName) {
+  // Parse the product ID as an integer
+  const parsedProductId = parseInt(productId, 10);
+
+  // Find the product div in the brandList with the parsed product ID
+  const productDiv = document.querySelector(`[data-product-id="${parsedProductId}"]`);
+
+  // Update the product name in the product div
+  if (productDiv) {
+    productDiv.querySelector('.product-name').textContent = newProductName;
+  }
+}
+
+
+
+function renameProduct() {
+  const newProductName = document.getElementById('newProductName').value;
+  const productId = document.getElementById('productId').value; // Get productId from the hidden input
+
+  // Check if newProductName is undefined, null, or an empty string
+  if (newProductName === undefined || newProductName === null || newProductName.trim() === '') {
+    alert('New product name is missing or invalid');
+    return;
+  }
+
+  // Make an AJAX request to update the product name in the database
+  fetch(`/products/${productId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ newProductName: newProductName }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Handle the response data if needed
+      console.log(data.message);
+
+      // Update the product name in the productDiv
+      updateProductInList(productId, newProductName);
+    })
+    .catch((error) => {
+      console.error('Error updating product name:', error);
+    });
+
+  // Close the popup or perform any other actions
+  closeRenamePopup();
+}
+
+
+
+
+
+
+
+
+
+
+
+// Add this code at the end of your script
+window.addEventListener('load', initializeProductList);
+
+      </script>
+  </body>
+</html>

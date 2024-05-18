@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+
+
+
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 5px; /* Adjust the border radius to your preference */
+}
+
+button:hover {
+  background-color: #0056b3; /* Change the background color on hover */
+}
+        .popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+        .product-name{
+            
+             padding-left:100px;
+              font-size: 1.2rem;
+              font-weight:bold;
+        }
+        #brandList{
+            background: #fff;
+            max-width: 350px;
+            position:relative;
+            margin-left:80px;
+            margin-top:5px;
+          
+        }
+        .delete-button{
+            position:relative;
+            bottom:2px;
+            left:40px;
+        }
+          #brandPopup{
+            margin-top:20px;
+            margin-left:40px;
+          }
+        
+
+
+
+        
+      </style>
+  </head>
+  <body>
+    <div class="grid-container">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="menu-icon" onclick="openSidebar()">
+          <span class="material-icons-outlined">menu</span>
+        </div>
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <!-- End Header -->
+
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-icons-outlined">inventory</span> GREY INVENTORY
+          </div>
+          <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+        </div>
+
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <a href="/dashboard">
+              <span class="material-icons-outlined">dashboard</span> Dashboard
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/products">
+              <span class="material-icons-outlined">inventory_2</span> Products
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/categories">
+              <span class="material-icons-outlined">fact_check</span> Categories
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/stocks">
+              <span class="material-icons-outlined">add_shopping_cart</span> Stocks
+            </a>
+          </li>
+          
+          <li class="sidebar-list-item">
+            <a href="/home">
+              <span class="material-icons-outlined">logout</span> LogOut
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main -->
+      <main class="main-container">
+        <div class="main-title">
+          <p class="font-weight-bold">PRODUCTS</p>
+        </div>
+
+        <div>
+            <h2>Manage Products</h2>
+            <button onclick="openPopup()">Add New Product</button>
+  
+            <!-- Popup for adding brands -->
+            <div id="brandPopup" class="popup">
+              <h3>Add New Product</h3>
+              <label for="brandName">Enter New Product</label>
+              <input type="text" id="brandName" name="">
+              <button onclick="closePopup()">Close</button>
+              <button onclick="addBrand()">Submit</button>
+            </div>
+            <div id="overlay" class="overlay"></div>
+            
+            <!-- Display entered brands here -->
+            <div id="brandList">
+              <!-- Brands will be dynamically added here -->
+            </div>
+          </div>
+      
+
+      </main>
+      <!-- End Main -->
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- ApexCharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/scripts.js"></script>
+    <script>
+        function openPopup() {
+          document.getElementById("brandPopup").style.display = "block";
+          document.getElementById("overlay").style.display = "block";
+        }
+  
+        function closePopup() {
+          document.getElementById("brandPopup").style.display = "none";
+          document.getElementById("overlay").style.display = "none";
+        }
+  
+        function addBrand() {
+  const brandName = document.getElementById('brandName').value;
+
+  if (brandName.trim() !== '') {
+    // Create the product div and add it to the brandList
+    const productDiv = createProductDiv(brandName);
+    brandList.appendChild(productDiv);
+
+    // Make an AJAX request to the server to store the product name
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/products', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({ productName: brandName }));
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        // Product added successfully
+        console.log('Product added successfully');
+      }
+    };
+
+    // Use productDiv here instead of brandDiv
+    document.getElementById('brandName').value = '';
+    closePopup();
+  }
+}
+
+
+function createProductDiv(productName) {
+  const productDiv = document.createElement("div");
+  productDiv.className = "product-item";
+  productDiv.innerHTML = `
+    <span class="product-name">${productName}</span>
+    <button class="delete-button" onclick="deleteProduct(this)">Delete</button>
+  `;
+  return productDiv;
+}
+
+function deleteProduct(button) {
+  const productDiv = button.parentElement;
+  const productName = productDiv.querySelector(".product-name").textContent;
+
+  // Make an AJAX request to delete the product from the database
+  fetch(`/products/${productName}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        // Product deleted successfully from the database
+        console.log(`Product ${productName} deleted successfully`);
+        brandList.removeChild(productDiv); // Remove the product from the brandList div
+      } else {
+        console.error('Error deleting product:', response.statusText);
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting product:', error);
+    });
+}
+
+function initializeProductList() {
+  // Make an AJAX request to fetch the product names from the server
+  fetch('/products', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        console.error('Error fetching product names:', response.statusText);
+        return [];
+      }
+    })
+    .then((productNames) => {
+      // Clear the existing product list
+      brandList.innerHTML = '';
+
+      // Populate the product list with the fetched product names
+      productNames.forEach((productName) => {
+        const productDiv = createProductDiv(productName);
+        brandList.appendChild(productDiv);
+      });
+    })
+    .catch((error) => {
+      console.error('Error fetching product names:', error);
+    });
+}
+
+initializeProductList();
+
+
+      </script>
+  </body>
+</html>

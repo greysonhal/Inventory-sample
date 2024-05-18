@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+
+       /* Add styling to the "Add New Product" button */
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 5px; /* Adjust the border radius to your preference */
+}
+
+button:hover {
+  background-color: #0056b3; /* Change the background color on hover */
+}
+
+
+
+      .popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+
+      .category-list {
+        margin-top: 40px;
+        background:#fff;
+        max-width:300px;
+        position:relative;
+      }
+
+      .popup{
+        margin-top: 20px;
+      }
+      .category{
+       
+        font-size:1.5rem;
+        padding-left:96px;
+      }
+      .delete-button{
+        
+        position:relative;
+        left:90px;
+        bottom: 10px;
+      }
+
+      
+
+      
+    </style>
+
+  </head>
+  <body>
+    <div class="grid-container">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="menu-icon" onclick="openSidebar()">
+          <span class="material-icons-outlined">menu</span>
+        </div>
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <!-- End Header -->
+
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-icons-outlined">inventory</span> GREY INVENTORY
+          </div>
+          <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+        </div>
+
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <a href="/dashboard">
+              <span class="material-icons-outlined">dashboard</span> Dashboard
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/products" >
+              <span class="material-icons-outlined">inventory_2</span> Products
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/categories">
+              <span class="material-icons-outlined">fact_check</span> Categories
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/stocks">
+              <span class="material-icons-outlined">add_shopping_cart</span> Stocks
+            </a>
+          </li>
+        
+          <li class="sidebar-list-item">
+            <a href="/home">
+              <span class="material-icons-outlined">logout</span> LogOut
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main -->
+      <main class="main-container">
+        <div class="main-title">
+          <p class="font-weight-bold">Categories</p>
+        </div>
+
+        <div>
+          <h2>Manage Categories</h2>
+          <button onclick="openPopup()">Add New Category</button>
+
+          <!-- Popup for adding categories -->
+          <div id="categoryPopup" class="popup">
+            <h3>Add New Category</h3>
+            <label for="categoryName">Enter New Category</label>
+            <input type="text" id="categoryName">
+            <button onclick="closePopup()">Close</button>
+            <button onclick="addCategory()">Submit</button>
+          </div>
+ 
+          <div id="overlay" class="overlay"></div>
+
+          <!-- Display entered categories here -->
+          <div id="categoryList" class="category-list">
+            <!-- Categories will be dynamically added here -->
+          </div>
+        </div>
+
+
+      </main>
+      <!-- End Main -->
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- ApexCharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/scripts.js"></script>
+    <script>
+      function openPopup() {
+        document.getElementById("categoryPopup").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+      }
+
+      function closePopup() {
+        document.getElementById("categoryPopup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+      }
+
+      function addCategory() {
+  const categoryName = document.getElementById("categoryName").value;
+  if (categoryName.trim() !== "") {
+    const categoryList = document.getElementById("categoryList");
+    const categoryDiv = document.createElement("div");
+    categoryDiv.classList.add("category-item"); // Add a class for styling
+    categoryDiv.innerHTML = `
+      <p class="category">${categoryName}</p>
+      <button class="delete-button">Delete</button>
+    `;
+    categoryList.prepend(categoryDiv); // Insert new categories at the beginning
+    document.getElementById("categoryName").value = "";
+
+    // Send an AJAX request to add the category to the database
+    // You should replace this with your server-side logic
+    fetch("/categories", {
+      method: "POST",
+      body: JSON.stringify({ categoryName }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data); // Handle the response from the server
+      })
+      .catch((error) => {
+        console.error("Error adding category:", error);
+      });
+
+    // Add event listener for the delete button
+    const deleteButton = categoryDiv.querySelector(".delete-button");
+    deleteButton.addEventListener("click", () => {
+      categoryDiv.remove();
+      // Send an AJAX request to delete the category from the database
+      // You should replace this with your server-side logic
+      fetch(`/categories/${categoryName}`, {
+        method: "DELETE",
+        body: JSON.stringify({ categoryName }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data); // Handle the response from the server
+        })
+        .catch((error) => {
+          console.error("Error deleting category:", error);
+        });
+    });
+  }
+}
+
+    </script>
+  </body>
+</html>

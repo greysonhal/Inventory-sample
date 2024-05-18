@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+      /* Add your custom CSS here */
+      .bill-form {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .bill-form label {
+        margin-top: 10px;
+      }
+
+      .bill-form select,
+      .bill-form input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      .bill-form button {
+        margin-top: 10px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .print-button {
+        background-color: #4CAF50;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="menu-icon" onclick="openSidebar()">
+          <span class="material-icons-outlined">menu</span>
+        </div>
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <!-- End Header -->
+
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-icons-outlined">inventory</span> GREY INVENTORY
+          </div>
+          <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+        </div>
+
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <a href="/dashboard">
+              <span class="material-icons-outlined">dashboard</span> Dashboard
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/products">
+              <span class="material-icons-outlined">inventory_2</span> Products
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/categories">
+              <span class="material-icons-outlined">fact_check</span> Categories
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/stocks">
+              <span class="material-icons-outlined">add_shopping_cart</span> Stocks
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/orders">
+              <span class="material-icons-outlined">shopping_cart</span> View Orders
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/Bills">
+              <span class="material-icons-outlined">payments</span> Bill
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="#" target="_blank">
+              <span class="material-icons-outlined">settings</span> Settings
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main -->
+      <main class="main-container">
+        <div class="main-title">
+          <p class="font-weight-bold">Bill</p>
+        </div>
+
+                <!-- Add New Item Form -->
+                <div class="bill-form">
+                  <h2>Add New Item</h2>
+                  <div class="table-row">
+                    <div class="table-column">
+                      <label for="item-id">Item Id</label>
+                      <input type="text" id="item-id" />
+                    </div>
+                    <div class="table-column">
+                      <label for="category">Category</label>
+                      <select id="category">
+                        <option value="" disabled selected>Categories</option>
+                        <!-- Populate categories dynamically from /categories -->
+                      </select>
+                    </div>
+                    <div class="table-column">
+                      <label for="product">Product</label>
+                      <select id="product">
+                        <option value="" disabled selected>Products</option>
+                        <!-- Populate products dynamically from /products -->
+                      </select>
+                    </div>
+                    <div class="table-column">
+                      <label for="amount">Amount</label>
+                      <input type="text" id="amount" />
+                    </div>
+                  </div>
+                  <button onclick="submitBillItem()">Submit</button>
+                  <button class="print-button" onclick="printBill()">Print Bill</button>
+                </div>
+        
+                <!-- Submitted Bill Items -->
+                <div class="bill-items">
+                  <h2>Submitted Bill Items</h2>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Item Id</th>
+                        <th>Category</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Filled dynamically when items are submitted -->
+                    </tbody>
+                  </table>
+                </div>
+        
+
+
+      </main>
+      <!-- End Main -->
+
+    </div>
+
+    <!-- Scripts -->
+    <!-- ApexCharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/scripts.js"></script>
+    <script>
+      // Function to submit a new item to the bill
+      function submitBillItem() {
+        const itemID = document.getElementById('item-id').value;
+        const category = document.getElementById('category').value;
+        const product = document.getElementById('product').value;
+        const amount = document.getElementById('amount').value;
+
+        // Create a new row for the bill items
+        const billItemsTable = document.querySelector('.bill-items table tbody');
+        const newRow = document.createElement('tr');
+
+        // Create cells for the new row
+        const cells = [itemID, category, product, amount];
+        cells.forEach((cellData) => {
+          const newCell = document.createElement('td');
+          newCell.innerText = cellData;
+          newRow.appendChild(newCell);
+        });
+
+        // Add the new row to the bill items table
+        billItemsTable.appendChild(newRow);
+
+        // Clear input values
+        document.getElementById('item-id').value = '';
+        document.getElementById('category').value = '';
+        document.getElementById('product').value = '';
+        document.getElementById('amount').value = '';
+      }
+
+      // Function to print the bill
+      function printBill() {
+        // You can implement PDF generation and printing here
+        // This may require using a PDF generation library or service
+        // and opening a new window or initiating a download for the generated PDF.
+        // The specific implementation would depend on your technology stack.
+      }
+    </script>
+  </body>
+</html>

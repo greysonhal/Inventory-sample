@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+
+table {
+    width: 100%; /* Make the table full width */
+    border-collapse: collapse; /* Remove default spacing between table cells */
+  }
+
+  th, td {
+    padding: 8px; /* Add padding to cells for spacing */
+    text-align: left; /* Align text to the left */
+    border: 1px solid #ddd; /* Add borders to cells */
+  }
+
+  thead {
+    background-color: #f2f2f2; /* Background color for the table header */
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Alternating row colors */
+  }
+
+      /* Add your custom CSS here */
+      .stock-form {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .stock-form label {
+        margin-top: 10px;
+      }
+
+      .stock-form select,
+      .stock-form input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      .stock-form button {
+        margin-top: 10px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .stock-summary {
+        display: none;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container">
+      <!-- Header -->
+      <header class="header">
+        <div class="menu-icon" onclick="openSidebar()">
+          <span class="material-icons-outlined">menu</span>
+        </div>
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <!-- End Header -->
+
+      <!-- Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-icons-outlined">inventory</span> GREY INVENTORY
+          </div>
+          <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+        </div>
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <a href="/dashboard">
+              <span class="material-icons-outlined">dashboard</span> Dashboard
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/products">
+              <span class="material-icons-outlined">inventory_2</span> Products
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/categories">
+              <span class="material-icons-outlined">fact_check</span> Categories
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/stocks">
+              <span class="material-icons-outlined">add_shopping_cart</span> Stocks
+            </a>
+          </li>
+          <li class="sidebar-list-item">
+            <a href="/home">
+              <span class="material-icons-outlined">logout</span> LogOut
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main -->
+      <main class="main-container">
+        <div class="main-title">
+          <p class="font-weight-bold">Stocks</p>
+        </div>
+        
+        <!-- Add New Stock Form -->
+        <div class="stock-form">
+          <h2>Add New Stock</h2>
+          
+          <div class="stock-table">
+            <div class="table-row">
+              <div class="table-column">
+                <label for="item-id">Item Id</label>
+                <input type="text" id="item-id" />
+              </div>
+              <div class="table-column">
+                <label for="category">Category</label>
+                <select id="category">
+                  <option value="" disabled selected>Categories</option>
+                  <!-- You can populate categories here dynamically -->
+                  <% categories.forEach(function(category) { %>
+                    <option value="<%= category.category_id %>"><%= category.category_name %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="table-column">
+                <label for="product">Product</label>
+                <select id="product">
+                  <option value="" disabled selected>Products</option>
+                  <!-- You can populate products here dynamically -->
+                  <% products.forEach(function(product) { %>
+                    <option value="<%= product.product_id %>"><%= product.product_name %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="table-column">
+                <label for="amount">Amount</label>
+                <input type="text" id="amount" />
+              </div>
+            </div>
+          </div>
+          <button onclick="submitStock()">Submit</button>
+        </div>
+
+        <!-- Stock Summary -->
+        <div class="stock-summary">
+          <h2>Stock SUMMARY</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Item Id</th>
+                <th>Category</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Date entered</th>
+                <th>Time entered</th>
+              </tr>
+            </thead>
+            <tbody id="stock-summary-body">
+             <!-- Modify this part in your EJS template -->
+          <% stockSummary.forEach(function(stock) { %>
+  <tr>
+    <td><%= stock.item_id %></td>
+    <td><%= stock.category_name %></td> <!-- Display category name -->
+    <td><%= stock.product_name %></td> <!-- Display product name -->
+    <td><%= stock.amount %></td>
+    <td><%= stock.date_entered %></td>
+    <td><%= stock.time_entered %></td>
+  </tr>
+            <% }); %>
+            </tbody>
+          </table>
+         
+        </div>
+      </main>
+      <!-- End Main -->
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <script>
+      // Add this code inside the <script> element in your HTML
+    
+      document.addEventListener('DOMContentLoaded', function () {
+        // Fetch and populate existing stock data
+        fetch('/stocks')
+          .then((response) => response.json())
+          .then((data) => {
+            const stockSummaryTable = document.getElementById('stock-summary-body');
+            data.forEach((stock) => {
+              const newRow = document.createElement('tr');
+              newRow.innerHTML = `<td>${stock.item_id}</td><td>${stock.category_name}</td><td>${stock.product_name}</td><td>${stock.amount}</td><td>${stock.date_entered}</td><td>${stock.time_entered}</td>`;
+              stockSummaryTable.appendChild(newRow);
+            });
+    
+            // Show the "Stock Summary" div if there is data
+            const stockSummaryDiv = document.querySelector('.stock-summary');
+            if (data.length > 0) {
+              stockSummaryDiv.style.display = 'block';
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching stock data:', error);
+          });
+      });
+    
+      function submitStock() {
+        const itemID = document.getElementById('item-id').value;
+        const category = document.getElementById('category').value;
+        const product = document.getElementById('product').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+    
+        // Send the data to the server to save it in the database
+        fetch('/stocks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            itemID,
+            category,
+            product,
+            amount,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // After successfully adding the stock, fetch product and category names
+            fetchNamesAndDisplay(itemID, category, product, amount);
+          })
+          .catch((error) => {
+            console.error('Error submitting stock:', error);
+          });
+      }
+    
+      function fetchNamesAndDisplay(itemID, categoryID, productID, amount) {
+        // Fetch the product and category names based on the IDs
+        fetch('/getNamesForStock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            categoryID,
+            productID,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Display the submitted data in the stock-summary table with names
+            const stockSummaryTable = document.getElementById('stock-summary-body');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `<td>${itemID}</td><td>${data.category_name}</td><td>${data.product_name}</td><td>${amount}</td><td>${new Date().toLocaleDateString()}</td><td>${new Date().toLocaleTimeString()}</td>`;
+            stockSummaryTable.appendChild(newRow);
+    
+            // Show the "Stock Summary" div
+            const stockSummaryDiv = document.querySelector('.stock-summary');
+            stockSummaryDiv.style.display = 'block';
+    
+            // Clear input values
+            document.getElementById('item-id').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('product').value = '';
+            document.getElementById('amount').value = '';
+          })
+          .catch((error) => {
+            console.error('Error fetching names:', error);
+          });
+      }
+    </script>
+    
+  </body>
+</html>
